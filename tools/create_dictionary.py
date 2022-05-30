@@ -43,7 +43,7 @@ def create_dictionary(dataroot, task='vqa'):
             'val_ids.pkl',
             'test_ids.pkl',
         ]
-        sentence_dir = os.path.join(dataroot, 'Flickr30kEntities/Sentences')
+        sentence_dir = os.path.join(dataroot, 'flickr30k_entities/Sentences')
 
         for path in files:
             ids_file = os.path.join(dataroot, path)

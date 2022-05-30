@@ -228,8 +228,8 @@ def _load_flickr30k(dataroot, img_id2idx, bbox, pos_boxes):
     entries = []
     for image_id, idx in img_id2idx.items():
 
-        phrase_file = os.path.join(dataroot, 'Flickr30kEntities/Sentences/%d.txt' % image_id)
-        anno_file = os.path.join(dataroot, 'Flickr30kEntities/Annotations/%d.xml' % image_id)
+        phrase_file = os.path.join(dataroot, 'flickr30k_entities/Sentences/%d.txt' % image_id)
+        anno_file = os.path.join(dataroot, 'flickr30k_entities/Annotations/%d.xml' % image_id)
 
         with open(phrase_file, 'r', encoding='utf-8') as f:
             sents = [x.strip() for x in f]
