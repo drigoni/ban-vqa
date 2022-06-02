@@ -77,10 +77,15 @@ def extract(split, infiles, task='vqa'):
             'train': 'data/flickr30k/flickr30k_images',
             'val': 'data/flickr30k/flickr30k_images',
             'test': 'data/flickr30k/flickr30k_images'}
+        # known_num_boxes = {
+        #     'train': 903500,
+        #     'val': 30722,
+        #     'test': 30648,}
         known_num_boxes = {
-            'train': 903500,
-            'val': 30722,
-            'test': 30648,}
+            'train': None,
+            'val': None,
+            'test': None,}
+
 
     feature_length = 2048
     min_fixed_boxes = 10
@@ -93,9 +98,9 @@ def extract(split, infiles, task='vqa'):
         cPickle.dump(imgids, open(ids_file[split], 'wb'))
 
     h = h5py.File(data_file[split], 'w')
-
+    
     if known_num_boxes[split] is None:
-        num_boxes = 0
+        num_box_list = []
         for infile in infiles:
             print("reading tsv...%s" % infile)
             with open(infile, "r+") as tsv_in_file:
@@ -104,7 +109,11 @@ def extract(split, infiles, task='vqa'):
                     item['num_boxes'] = int(item['num_boxes'])
                     image_id = int(item['image_id'])
                     if image_id in imgids:
-                        num_boxes += item['num_boxes']
+                        num_box_list.append(item['num_boxes'])
+        num_boxes = sum(num_box_list)
+        print('Number of detected boxes for split {}: {}. '.format(split, num_boxes))
+        print("Max number of boxes for split {}: {}".format(split, max(num_box_list)))
+        print("Min number of boxes for split {}: {}".format(split, min(num_box_list)))
     else:
         num_boxes = known_num_boxes[split]
 
@@ -136,7 +145,7 @@ def extract(split, infiles, task='vqa'):
                 image_w = float(item['image_w'])
                 image_h = float(item['image_h'])
                 bboxes = np.frombuffer(
-                    base64.decodestring(item['boxes']),
+                    base64.b64decode(item['boxes']),
                     dtype=np.float32).reshape((item['num_boxes'], -1))
 
                 box_width = bboxes[:, 2] - bboxes[:, 0]
@@ -168,7 +177,7 @@ def extract(split, infiles, task='vqa'):
                     pos_boxes[counter,:] = np.array([num_boxes, num_boxes + item['num_boxes']])
                     img_bb[num_boxes:num_boxes+item['num_boxes'], :] = bboxes
                     img_features[num_boxes:num_boxes+item['num_boxes'], :] = np.frombuffer(
-                        base64.decodestring(item['features']),
+                        base64.b64decode(item['features']),
                         dtype=np.float32).reshape((item['num_boxes'], -1))
                     spatial_img_features[num_boxes:num_boxes+item['num_boxes'], :] = spatial_features
                     counter += 1

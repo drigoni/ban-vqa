@@ -78,14 +78,10 @@ def extract(split, infiles, task='vqa'):
             'train': 'data/flickr30k/flickr30k_images',
             'val': 'data/flickr30k/flickr30k_images',
             'test': 'data/flickr30k/flickr30k_images'}
-        # known_num_boxes = {
-        #     'train': 903500,
-        #     'val': 30722,
-        #     'test': 30648,}
-        # known_num_boxes = { drigoni new_features
-        #     'train': 1711157,
-        #     'val': 56886,
-        #     'test': 56731,}
+        # known_num_boxes = { drigoni new_features      old_features
+        #     'train': 1711157,                         1783785
+        #     'val': 56886,                             59122
+        #     'test': 56731,}                           59256
         known_num_boxes = {
             'train': None,
             'val': None,
@@ -104,7 +100,7 @@ def extract(split, infiles, task='vqa'):
     h = h5py.File(data_file[split], 'w')
 
     if known_num_boxes[split] is None:
-        num_boxes = 0
+        num_box_list = []
         for infile in infiles:
             print("reading tsv...%s" % infile)
             with open(infile, "r+") as tsv_in_file:
@@ -113,8 +109,11 @@ def extract(split, infiles, task='vqa'):
                     item['num_boxes'] = int(item['num_boxes'])
                     image_id = int(item['image_id'])
                     if image_id in imgids:
-                        num_boxes += item['num_boxes']
+                        num_box_list.append(item['num_boxes'])
+        num_boxes = sum(num_box_list)
         print('Number of detected boxes for split {}: {}. '.format(split, num_boxes))
+        print("Max number of boxes for split {}: {}".format(split, max(num_box_list)))
+        print("Min number of boxes for split {}: {}".format(split, min(num_box_list)))
     else:
         num_boxes = known_num_boxes[split]
 
