@@ -51,7 +51,7 @@ def load_data(img_folder):
             all_data['image_id'].append(img_id)
             all_data['image_w'].append(f['image_w'])
             all_data['image_h'].append(f['image_h'])
-            all_data['num_bbox'].append(f['num_bbox'])
+            all_data['num_boxes'].append(f['num_bbox'])
             # check
             # print(f['bbox'])
             # print(base64.b64encode(f['bbox']))
@@ -94,6 +94,12 @@ if __name__ == '__main__':
     if os.path.exists(args.extracted_features):
         print('Loading all data.')
         all_data = load_data(args.extracted_features)
+        
+        # print("Mean number of boxes: ", np.mean(all_data['num_boxes']))
+        # print("Max number of boxes: ", max(all_data['num_boxes']))
+        # print("Min number of boxes: ", min(all_data['num_boxes']))
+        # exit(1)
+
         print("Saving data.")
         splits = ['./data/flickr30k/flickr30k_entities/train.txt',
                     './data/flickr30k/flickr30k_entities/val.txt',
