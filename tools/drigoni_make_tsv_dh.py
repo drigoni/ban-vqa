@@ -48,6 +48,7 @@ def load_data(img_folder):
 
     # load all data dict_keys(['pred_boxes', 'scores', 'pred_classes', 'features', 'attr_prob', 'probs'])
     all_data = defaultdict(list)
+    fake_boxes = 0
     for img_file in onlyfiles:
         img_id = img_file.split('/')[-1][:-7]
         with open(img_file, "rb") as file_opened:
@@ -58,24 +59,32 @@ def load_data(img_folder):
             all_data['image_id'].append(img_id)
             all_data['image_w'].append(im.size[0])
             all_data['image_h'].append(im.size[1])
-            all_data['num_boxes'].append(len(f['pred_boxes']))
-            # check
-            # print(f['bbox'])
-            # print(base64.b64encode(f['bbox']))
-            # print(base64.b64decode(base64.b64encode(f['bbox'])))
-            # print(np.frombuffer(base64.b64decode(base64.b64encode(f['bbox'])), dtype=np.float32))
-            # exit(1)
-            all_data['boxes'].append(base64.b64encode(np.array(f['pred_boxes'])))
-            all_data['features'].append(base64.b64encode(np.array(f['features'])))
-            # all_data['image_h_inner'].append(f['image_h_inner'])
-            # all_data['image_w_inner'].append(f['image_w_inner'])
-            # all_data['info'].append(f['info'])
-            # info = {
-            #     "objects": classes.cpu().numpy(),
-            #     "cls_prob": cls_probs.cpu().numpy(),
-            #     'attrs_id': attr_probs,
-            #     'attrs_scores': attr_scores,
-            # }
+            n_boxes = len(f['pred_boxes'])
+            if n_boxes > 0:
+                all_data['num_boxes'].append(n_boxes)
+                # check
+                # print(f['bbox'])
+                # print(base64.b64encode(f['bbox']))
+                # print(base64.b64decode(base64.b64encode(f['bbox'])))
+                # print(np.frombuffer(base64.b64decode(base64.b64encode(f['bbox'])), dtype=np.float32))
+                # exit(1)
+                all_data['boxes'].append(base64.b64encode(np.array(f['pred_boxes'])))
+                all_data['features'].append(base64.b64encode(np.array(f['features'])))
+                # all_data['image_h_inner'].append(f['image_h_inner'])
+                # all_data['image_w_inner'].append(f['image_w_inner'])
+                # all_data['info'].append(f['info'])
+                # info = {
+                #     "objects": classes.cpu().numpy(),
+                #     "cls_prob": cls_probs.cpu().numpy(),
+                #     'attrs_id': attr_probs,
+                #     'attrs_scores': attr_scores,
+                # }
+            else:
+                fake_boxes += 1
+                all_data['num_boxes'].append(1)
+                all_data['boxes'].append(base64.b64encode(np.zeros((1, 4))))
+                all_data['features'].append(base64.b64encode(np.zeros((1, 512))))
+    print("Fake boxes: ", fake_boxes)
     return pd.DataFrame(all_data)
 
 

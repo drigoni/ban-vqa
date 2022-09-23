@@ -226,8 +226,8 @@ def _load_flickr30k(dataroot, img_id2idx, bbox, pos_boxes):
     multibox_entity_count = 0
 
     entries = []
-    for image_id, idx in img_id2idx.items():
-
+    for i, (image_id, idx) in enumerate(img_id2idx.items()):
+        print("Image {}/{} .".format(i, len(img_id2idx)), end='\r')
         phrase_file = os.path.join(dataroot, 'flickr30k_entities/Sentences/%d.txt' % image_id)
         anno_file = os.path.join(dataroot, 'flickr30k_entities/Annotations/%d.xml' % image_id)
 
